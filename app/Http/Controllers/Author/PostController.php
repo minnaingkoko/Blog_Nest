@@ -5,7 +5,9 @@ namespace App\Http\Controllers\Author;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\StorePostRequest;
 use App\Http\Requests\UpdatePostRequest;
+use App\Models\Category;
 use App\Models\Post;
+use App\Models\Tag;
 
 class PostController extends Controller
 {
@@ -17,7 +19,14 @@ class PostController extends Controller
 
     public function create()
     {
-        return view('author.posts.create');
+        // Fetch categories from the database
+        $categories = Category::all();
+
+        // Fetch tags from the database
+        $tags = Tag::all();
+
+        // Pass categories and tags to the view
+        return view('author.posts.create', compact('categories', 'tags'));
     }
 
     public function store(StorePostRequest $request)
@@ -28,7 +37,17 @@ class PostController extends Controller
 
     public function edit(Post $post)
     {
-        return view('author.posts.edit', compact('post'));
+        // Ensure the author can only edit their own posts
+        abort_if($post->user_id !== auth()->id(), 403);
+
+        // Fetch categories from the database
+        $categories = Category::all();
+
+        // Fetch tags from the database
+        $tags = Tag::all();
+
+        // Pass post, categories, and tags to the view
+        return view('author.posts.edit', compact('post', 'categories', 'tags'));
     }
 
     public function update(UpdatePostRequest $request, Post $post)

@@ -4,36 +4,38 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\User;
+use App\Models\Role;
 use Illuminate\Http\Request;
 
 class UserController extends Controller
 {
-    /**
-     * Display a listing of the users.
-     */
-    public function index()
+    public function index(Request $request)
     {
-        $users = User::latest()->paginate(10);
-        return view('admin.users.index', compact('users'));
+        $query = User::query();
+        
+        if ($request->has('role')) {
+            $query->where('role_id', $request->role);
+        }
+        
+        $users = $query->with('role')->latest()->paginate(10);
+        $roles = Role::all();
+        
+        return view('admin.users.index', compact('users', 'roles'));
     }
 
-    /**
-     * Show the form for creating a new user.
-     */
     public function create()
     {
-        return view('admin.users.create');
+        $roles = Role::all();
+        return view('admin.users.create', compact('roles'));
     }
 
-    /**
-     * Store a newly created user in storage.
-     */
     public function store(Request $request)
     {
         $data = $request->validate([
             'name' => 'required|string|max:255',
             'email' => 'required|email|unique:users',
             'password' => 'required|string|min:8',
+            'role_id' => 'required|exists:roles,id'
         ]);
 
         $data['password'] = bcrypt($data['password']);
@@ -42,31 +44,24 @@ class UserController extends Controller
         return redirect()->route('admin.users.index')->with('success', 'User created successfully.');
     }
 
-    /**
-     * Display the specified user.
-     */
     public function show(User $user)
     {
         return view('admin.users.show', compact('user'));
     }
 
-    /**
-     * Show the form for editing the specified user.
-     */
     public function edit(User $user)
     {
-        return view('admin.users.edit', compact('user'));
+        $roles = Role::all();
+        return view('admin.users.edit', compact('user', 'roles'));
     }
 
-    /**
-     * Update the specified user in storage.
-     */
     public function update(Request $request, User $user)
     {
         $data = $request->validate([
             'name' => 'required|string|max:255',
             'email' => 'required|email|unique:users,email,' . $user->id,
             'password' => 'nullable|string|min:8',
+            'role_id' => 'required|exists:roles,id'
         ]);
 
         if (!empty($data['password'])) {
@@ -79,12 +74,65 @@ class UserController extends Controller
         return redirect()->route('admin.users.index')->with('success', 'User updated successfully.');
     }
 
-    /**
-     * Remove the specified user from storage.
-     */
     public function destroy(User $user)
     {
+        if ($user->id === auth()->id()) {
+            return redirect()->back()->with('error', 'You cannot delete your own account.');
+        }
+
         $user->delete();
         return redirect()->route('admin.users.index')->with('success', 'User deleted successfully.');
+    }
+
+    public function changeRole(Request $request, User $user)
+    {
+        $request->validate([
+            'role_id' => ['required', 'exists:roles,id']
+        ]);
+
+        if ($user->id === auth()->id()) {
+            return redirect()->back()->with('error', 'You cannot change your own role.');
+        }
+
+        $user->update(['role_id' => $request->role_id]);
+        
+        return redirect()->back()
+            ->with('success', "User role changed successfully to " . $user->fresh()->role->name);
+    }
+
+    public function bulkAction(Request $request)
+    {
+        $request->validate([
+            'action' => 'required|in:delete,promote,demote',
+            'user_ids' => 'required|array',
+            'user_ids.*' => 'exists:users,id'
+        ]);
+
+        $users = User::whereIn('id', $request->user_ids)
+            ->where('id', '!=', auth()->id())
+            ->get();
+
+        if ($users->isEmpty()) {
+            return redirect()->back()->with('error', 'No valid users selected.');
+        }
+
+        switch ($request->action) {
+            case 'delete':
+                $users->each->delete();
+                $message = 'Selected users deleted successfully.';
+                break;
+                
+            case 'promote':
+                $users->each->update(['role_id' => 2]);
+                $message = 'Selected users promoted to author successfully.';
+                break;
+                
+            case 'demote':
+                $users->each->update(['role_id' => 3]);
+                $message = 'Selected users demoted to regular user successfully.';
+                break;
+        }
+
+        return redirect()->back()->with('success', $message);
     }
 }

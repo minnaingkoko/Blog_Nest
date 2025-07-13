@@ -1,6 +1,4 @@
-@extends('layouts.admin')
-
-@section('content')
+<x-app-layout>
 <div class="container mx-auto px-4 py-8">
     <div class="flex justify-between items-center mb-8">
         <h1 class="text-3xl font-bold text-gray-900">My Posts</h1>
@@ -55,7 +53,6 @@
                                     @method('DELETE')
                                     <button type="submit" class="text-red-600 hover:text-red-900">Delete</button>
                                 </form>
-                                <a href="{{ route('posts.show', $post->slug) }}" target="_blank" class="text-gray-600 hover:text-gray-900">View</a>
                             </div>
                         </td>
                     </tr>
@@ -74,4 +71,4 @@
         </div>
     </div>
 </div>
-@endsection
+</x-app-layout>

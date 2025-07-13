@@ -22,7 +22,8 @@ class User extends Authenticatable implements MustVerifyEmail
         'email',
         'password',
         'avatar',
-        'bio'
+        'bio',
+        'role_id'
     ];
 
     protected $hidden = ['password', 'remember_token'];
@@ -66,5 +67,10 @@ class User extends Authenticatable implements MustVerifyEmail
     public function isAuthor(): bool
     {
         return $this->role?->name === 'author';
+    }
+
+    public function isUser()
+    {
+        return $this->role?->name  === 'user'; 
     }
 }

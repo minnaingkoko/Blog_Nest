@@ -20,7 +20,7 @@ return new class extends Migration
             $table->string('avatar')->nullable();
             $table->text('bio')->nullable();
             $table->rememberToken();
-            $table->foreignId('role_id')->constrained()->cascadeOnDelete(); 
+            $table->foreignId('role_id')->constrained('roles')->default(3)->cascadeOnDelete(); 
             $table->timestamps();
             $table->softDeletes();
         });

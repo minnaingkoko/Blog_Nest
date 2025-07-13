@@ -1,6 +1,4 @@
-@extends('layouts.admin')
-
-@section('content')
+<x-app-layout>
 <div class="container mx-auto px-4 py-8">
     <h1 class="text-3xl font-bold text-gray-900 mb-8">Create New Post</h1>
 
@@ -93,7 +91,7 @@
         </form>
     </div>
 </div>
-@endsection
+</x-app-layout>
 
 @push('scripts')
 <script>

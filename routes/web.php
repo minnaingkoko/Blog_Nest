@@ -1,8 +1,10 @@
 <?php
 
 use App\Http\Controllers\Admin\PostController as AdminPostController;
+use App\Http\Controllers\Admin\DashboardController as AdminDashboardController;
 use App\Http\Controllers\Admin\UserController as AdminUserController;
 use App\Http\Controllers\Author\PostController as AuthorPostController;
+
 use App\Http\Controllers\Public\PostController as PublicPostController;
 use App\Http\Controllers\User\CommentController;
 use App\Http\Controllers\User\LikeController;
@@ -15,6 +17,7 @@ use Illuminate\Support\Facades\Route;
 | Public Routes (Guest Access)
 |--------------------------------------------------------------------------
 */
+
 Route::get('/', [PublicPostController::class, 'index'])->name('home');
 Route::get('/posts/{post:slug}', [PublicPostController::class, 'show'])->name('posts.show');
 
@@ -23,7 +26,7 @@ Route::get('/posts/{post:slug}', [PublicPostController::class, 'show'])->name('p
 | Auth Routes (Breeze)
 |--------------------------------------------------------------------------
 */
-require __DIR__.'/auth.php';
+require __DIR__ . '/auth.php';
 
 /*
 |--------------------------------------------------------------------------
@@ -44,16 +47,35 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::post('/posts/{post}/like', [LikeController::class, 'store'])->name('likes.store');
 });
 
-// author
-
-Route::prefix('author')->middleware(['auth', 'verified', 'role:author'])->group(function () {
+/*
+|--------------------------------------------------------------------------
+| Author Routes (For Authors Only)
+|--------------------------------------------------------------------------
+*/
+Route::prefix('author')->middleware(['auth', 'verified', 'role.author'])->group(function () {
     Route::resource('posts', AuthorPostController::class)->except(['show'])->names('author.posts');
     // Add more author-specific routes here
 });
 
-// admin
+/*
+|--------------------------------------------------------------------------
+| Admin Routes (For Admins Only)
+|--------------------------------------------------------------------------
+*/
+Route::prefix('admin')->middleware(['auth', 'verified', 'role.admin'])->group(function () {
+    // Admin Dashboard
+    Route::get('/dashboard', [AdminDashboardController::class, 'index'])->name('admin.dashboard');
 
-Route::prefix('admin')->middleware(['auth', 'verified', 'role:admin'])->group(function () {
+    // Admin Posts Management
     Route::resource('/posts', AdminPostController::class)->names('admin.posts');
+
+    // Admin Users Management
     Route::resource('/users', AdminUserController::class)->names('admin.users');
+
+    // Additional user routes
+    Route::post('/users/{user}/change-role', [AdminUserController::class, 'changeRole'])
+        ->name('admin.users.change-role');
+
+    Route::post('/users/bulk-action', [AdminUserController::class, 'bulkAction'])
+        ->name('admin.users.bulk-action');
 });
