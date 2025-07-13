@@ -17,7 +17,7 @@ class BlogSeeder extends Seeder
 {
     public function run()
     {
-        // Create Roles
+        // Create Roles first (unchanged)
         $roles = [
             ['name' => 'admin', 'description' => 'Administrator'],
             ['name' => 'author', 'description' => 'Content Author'],
@@ -28,15 +28,19 @@ class BlogSeeder extends Seeder
             Role::create($role);
         }
 
-        // Create Admin User
+        // Get role IDs
+        $adminRoleId = Role::where('name', 'admin')->first()->id;
+        $authorRoleId = Role::where('name', 'author')->first()->id;
+        $userRoleId = Role::where('name', 'user')->first()->id;
+
+        // Create Admin User (assign role_id directly)
         $admin = User::create([
             'name' => 'Admin User',
             'email' => 'admin@example.com',
             'password' => Hash::make('password'),
             'email_verified_at' => now(),
+            'role_id' => $adminRoleId, // Set role_id here
         ]);
-
-        $admin->assignRole('admin');
 
         // Create Author User
         $author = User::create([
@@ -44,9 +48,8 @@ class BlogSeeder extends Seeder
             'email' => 'author@example.com',
             'password' => Hash::make('password'),
             'email_verified_at' => now(),
+            'role_id' => $authorRoleId, // Set role_id here
         ]);
-
-        $author->assignRole('author');
 
         // Create Regular User
         $user = User::create([
@@ -54,9 +57,8 @@ class BlogSeeder extends Seeder
             'email' => 'user@example.com',
             'password' => Hash::make('password'),
             'email_verified_at' => now(),
+            'role_id' => $userRoleId, // Set role_id here
         ]);
-
-        $user->assignRole('user');
 
         // Create Categories
         $categories = [

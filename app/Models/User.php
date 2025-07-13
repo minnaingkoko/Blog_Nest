@@ -18,48 +18,53 @@ class User extends Authenticatable implements MustVerifyEmail
     use HasFactory, Notifiable;
 
     protected $fillable = [
-        'name', 'email', 'password', 'avatar', 'bio'
+        'name',
+        'email',
+        'password',
+        'avatar',
+        'bio'
     ];
 
     protected $hidden = ['password', 'remember_token'];
-    
+
     protected $casts = ['email_verified_at' => 'datetime'];
 
-    public function roles()
+    public function role()
     {
-        return $this->belongsToMany(Role::class)->withTimestamps();
+        return $this->belongsTo(Role::class);
     }
-    
+
     public function posts()
     {
         return $this->hasMany(Post::class);
     }
-    
+
     public function comments()
     {
         return $this->hasMany(Comment::class);
     }
-    
+
     public function likes()
     {
         return $this->hasMany(Like::class);
     }
-    
-    public function assignRole($role)
+
+    public function assignRole($role): void
     {
         if (is_string($role)) {
             $role = Role::whereName($role)->firstOrFail();
         }
-        $this->roles()->syncWithoutDetaching($role);
+        $this->role()->associate($role);
+        $this->save();
     }
-    
-    public function isAdmin()
+
+    public function isAdmin(): bool
     {
-        return $this->roles()->where('name', 'admin')->exists();
+        return $this->role?->name === 'admin';
     }
-    
-    public function isAuthor()
+
+    public function isAuthor(): bool
     {
-        return $this->roles()->where('name', 'author')->exists();
+        return $this->role?->name === 'author';
     }
 }

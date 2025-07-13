@@ -17,6 +17,20 @@
 </head>
 
 <body class="font-sans text-gray-900 antialiased bg-gray-100">
+        <nav class="bg-white shadow">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between h-16">
+                <!-- Logo -->
+                <div class="shrink-0 flex items-center">
+                    <a href="/">
+                        <x-application-logo class="block h-9 w-auto fill-current text-gray-800" />
+                    </a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    
     <!-- Minimal layout for login/register pages -->
     <div class="min-h-screen flex flex-col sm:justify-center items-center pt-6 sm:pt-0">
         <div class="w-full sm:max-w-md mt-6 px-6 py-4 bg-white shadow-md overflow-hidden sm:rounded-lg">

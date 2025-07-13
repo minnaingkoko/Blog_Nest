@@ -15,19 +15,19 @@ use Illuminate\Support\Facades\Route;
 | Public Routes (Guest Access)
 |--------------------------------------------------------------------------
 */
-Route::get('/', [PublicPostController::class, 'index'])->name('home')->middleware('guest');
-Route::get('/posts/{post:slug}', [PublicPostController::class, 'show'])->name('posts.show')->middleware('guest');
+Route::get('/', [PublicPostController::class, 'index'])->name('home');
+Route::get('/posts/{post:slug}', [PublicPostController::class, 'show'])->name('posts.show');
 
 /*
 |--------------------------------------------------------------------------
 | Auth Routes (Breeze)
 |--------------------------------------------------------------------------
 */
-require __DIR__ . '/auth.php';
+require __DIR__.'/auth.php';
 
 /*
 |--------------------------------------------------------------------------
-| User Routes (Logged-in Users)
+| Authenticated User Routes (All Logged-in Users)
 |--------------------------------------------------------------------------
 */
 Route::middleware(['auth', 'verified'])->group(function () {
@@ -39,30 +39,21 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 
-    // Comments & Likes
+    // Post Interactions
     Route::post('/posts/{post}/comment', [CommentController::class, 'store'])->name('comments.store');
     Route::post('/posts/{post}/like', [LikeController::class, 'store'])->name('likes.store');
 });
 
-/*
-|--------------------------------------------------------------------------
-| Author Routes (Role: Author)
-|--------------------------------------------------------------------------
-*/
-Route::middleware(['auth', 'verified', 'role:author'])->group(function () {
-    // Post Management
-    Route::resource('/author/posts', AuthorPostController::class)->except(['show']);
+// author
+
+Route::prefix('author')->middleware(['auth', 'verified', 'role:author'])->group(function () {
+    Route::resource('posts', AuthorPostController::class)->except(['show'])->names('author.posts');
+    // Add more author-specific routes here
 });
 
-/*
-|--------------------------------------------------------------------------
-| Admin Routes (Role: Admin)
-|--------------------------------------------------------------------------
-*/
-Route::middleware(['auth', 'verified', 'role:admin'])->group(function () {
-    // Post Management
-    Route::resource('/admin/posts', AdminPostController::class)->except(['show']);
+// admin
 
-    // User Management
-    Route::resource('/admin/users', AdminUserController::class);
+Route::prefix('admin')->middleware(['auth', 'verified', 'role:admin'])->group(function () {
+    Route::resource('/posts', AdminPostController::class)->names('admin.posts');
+    Route::resource('/users', AdminUserController::class)->names('admin.users');
 });
