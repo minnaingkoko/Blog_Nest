@@ -17,7 +17,7 @@ class BlogSeeder extends Seeder
 {
     public function run()
     {
-        // Create Roles first (unchanged)
+        // Create Roles
         $roles = [
             ['name' => 'admin', 'description' => 'Administrator'],
             ['name' => 'author', 'description' => 'Content Author'],
@@ -33,32 +33,34 @@ class BlogSeeder extends Seeder
         $authorRoleId = Role::where('name', 'author')->first()->id;
         $userRoleId = Role::where('name', 'user')->first()->id;
 
-        // Create Admin User (assign role_id directly)
+        // Create Admin Users
         $admin = User::create([
             'name' => 'Admin User',
             'email' => 'admin@example.com',
             'password' => Hash::make('password'),
             'email_verified_at' => now(),
-            'role_id' => $adminRoleId, // Set role_id here
+            'role_id' => $adminRoleId,
         ]);
 
-        // Create Author User
+        // Create Author Users
         $author = User::create([
             'name' => 'Blog Author',
             'email' => 'author@example.com',
             'password' => Hash::make('password'),
             'email_verified_at' => now(),
-            'role_id' => $authorRoleId, // Set role_id here
+            'role_id' => $authorRoleId,
         ]);
 
-        // Create Regular User
-        $user = User::create([
-            'name' => 'Regular User',
-            'email' => 'user@example.com',
-            'password' => Hash::make('password'),
-            'email_verified_at' => now(),
-            'role_id' => $userRoleId, // Set role_id here
-        ]);
+        // Create Regular Users
+        for ($i = 1; $i <= 13; $i++) {
+            User::create([
+                'name' => 'User ' . $i,
+                'email' => 'user' . $i . '@example.com',
+                'password' => Hash::make('password'),
+                'email_verified_at' => now(),
+                'role_id' => $userRoleId,
+            ]);
+        }
 
         // Create Categories
         $categories = [
@@ -66,6 +68,8 @@ class BlogSeeder extends Seeder
             ['name' => 'Business', 'slug' => 'business'],
             ['name' => 'Health', 'slug' => 'health'],
             ['name' => 'Travel', 'slug' => 'travel'],
+            ['name' => 'Education', 'slug' => 'education'],
+            ['name' => 'Lifestyle', 'slug' => 'lifestyle'],
         ];
 
         foreach ($categories as $category) {
@@ -79,84 +83,76 @@ class BlogSeeder extends Seeder
             ['name' => 'JavaScript', 'slug' => 'javascript'],
             ['name' => 'Vue', 'slug' => 'vue'],
             ['name' => 'React', 'slug' => 'react'],
+            ['name' => 'AI', 'slug' => 'ai'],
+            ['name' => 'Programming', 'slug' => 'programming'],
+            ['name' => 'Startup', 'slug' => 'startup'],
         ];
 
         foreach ($tags as $tag) {
             Tag::create($tag);
         }
 
-        // Create Posts (removed excerpt and published_at)
-        $posts = [
-            [
+        // Create Posts
+        $posts = [];
+        for ($i = 1; $i <= 15; $i++) {
+            $posts[] = [
                 'user_id' => $author->id,
-                'category_id' => Category::where('slug', 'technology')->first()->id,
-                'title' => 'Getting Started with Laravel',
-                'slug' => 'getting-started-with-laravel',
-                'content' => 'This is the full content of the Laravel tutorial post...',
-                'status' => 'published',
-            ],
-            [
-                'user_id' => $author->id,
-                'category_id' => Category::where('slug', 'technology')->first()->id,
-                'title' => 'Advanced PHP Techniques',
-                'slug' => 'advanced-php-techniques',
-                'content' => 'This post covers advanced PHP concepts...',
-                'status' => 'published',
-            ],
-            [
-                'user_id' => $author->id,
-                'category_id' => Category::where('slug', 'business')->first()->id,
-                'title' => 'Startup Funding Strategies',
-                'slug' => 'startup-funding-strategies',
-                'content' => 'This post explores various funding options...',
-                'status' => 'draft',
-            ],
-        ];
+                'category_id' => Category::inRandomOrder()->first()->id,
+                'title' => 'Post Title ' . $i,
+                'slug' => 'post-title-' . $i,
+                'content' => 'This is the full content of post ' . $i . '. Lorem ipsum dolor sit amet, consectetur adipiscing elit.',
+                'status' => $i % 3 === 0 ? 'draft' : ($i % 5 === 0 ? 'pending' : 'published'), // Vary statuses
+                'featured_image' => $i % 4 === 0 ? 'posts/sample-image-' . $i . '.jpg' : null,
+            ];
+        }
 
         foreach ($posts as $post) {
             $newPost = Post::create($post);
 
-            // Attach random tags
-            $randomTags = Tag::inRandomOrder()->limit(2)->pluck('id');
-            $newPost->tags()->attach($randomTags);
+            // Attach random tags (2-4 tags per post)
+            $randomTags = Tag::inRandomOrder()->limit(rand(2, 4))->pluck('id');
+            $newPost->tags()->sync($randomTags);
         }
 
-        // Create Comments
-        $comments = [
-            [
-                'user_id' => $user->id,
-                'post_id' => Post::first()->id,
-                'content' => 'Great post! Very helpful for beginners.',
-                'is_approved' => true,
-            ],
-            [
-                'user_id' => $admin->id,
-                'post_id' => Post::first()->id,
-                'content' => 'Thanks for sharing this tutorial.',
-                'is_approved' => true,
-            ],
-            [
-                'user_id' => $user->id,
-                'post_id' => Post::first()->id,
-                'parent_id' => 1,
-                'content' => 'I agree, this was really useful!',
-                'is_approved' => true,
-            ],
-        ];
+        // Create Comments (with nesting)
+        $comments = [];
+        foreach (Post::all() as $post) {
+            for ($i = 1; $i <= 3; $i++) {
+                $comment = [
+                    'user_id' => User::inRandomOrder()->first()->id,
+                    'post_id' => $post->id,
+                    'content' => 'This is a sample comment ' . $i . ' on post ' . $post->id . '.',
+                    'is_approved' => rand(0, 1),
+                ];
+                $comments[] = $comment;
+
+                // Add nested replies to this comment
+                if ($i === 1) {
+                    $reply = [
+                        'user_id' => User::inRandomOrder()->first()->id,
+                        'post_id' => $post->id,
+                        'parent_id' => count($comments), // Reply to the parent comment
+                        'content' => 'This is a reply to comment ' . $i . ' on post ' . $post->id . '.',
+                        'is_approved' => rand(0, 1),
+                    ];
+                    $comments[] = $reply;
+                }
+            }
+        }
 
         foreach ($comments as $comment) {
             Comment::create($comment);
         }
 
         // Create Likes
-        $likes = [
-            ['user_id' => $user->id, 'post_id' => Post::first()->id],
-            ['user_id' => $admin->id, 'post_id' => Post::first()->id],
-            ['user_id' => $user->id, 'post_id' => Post::skip(1)->first()->id],
-        ];
-
-        foreach ($likes as $like) {
-            Like::create($like);
+        foreach (Post::all() as $post) {
+            $randomUsers = User::inRandomOrder()->limit(rand(1, 5))->get();
+            foreach ($randomUsers as $user) {
+                Like::create([
+                    'user_id' => $user->id,
+                    'post_id' => $post->id,
+                ]);
+            }
         }
 
         // Create Settings

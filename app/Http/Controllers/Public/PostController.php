@@ -15,6 +15,15 @@ class PostController extends Controller
     {
         $posts = Post::query()->published();
 
+        // Search functionality
+        if ($request->has('search')) {
+            $search = $request->input('search');
+            $posts->where(function ($query) use ($search) {
+                $query->where('title', 'LIKE', "%{$search}%")
+                    ->orWhere('content', 'LIKE', "%{$search}%");
+            });
+        }
+
         // Filter by category
         if ($request->has('category')) {
             $posts->whereHas('category', function ($query) use ($request) {

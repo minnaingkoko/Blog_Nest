@@ -15,34 +15,50 @@
     <div class="py-12">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="grid grid-cols-1 lg:grid-cols-4 gap-8">
-                                <!-- Sidebar -->
+                <!-- Sidebar -->
                 <div class="lg:col-span-1">
-                    <!-- Category Filter -->
-                    <div class="bg-white rounded-lg shadow-lg p-6 mb-8">
-                        <h3 class="text-xl font-semibold text-gray-900 mb-4">Categories</h3>
-                        <ul class="space-y-2">
-                            @foreach ($categories as $category)
-                                <li>
-                                    <a href="{{ route('home', ['category' => $category->slug]) }}" class="text-gray-600 hover:text-blue-600 transition-colors duration-200">
-                                        {{ $category->name }}
-                                    </a>
-                                </li>
-                            @endforeach
-                        </ul>
-                    </div>
+                    <!-- Sticky Container -->
+                    <div class="sticky top-20">
+                        <!-- Search Bar -->
+                        <div class="mb-8">
+                            <form action="{{ route('home') }}" method="GET" class="flex items-center">
+                                <input type="text" name="search" placeholder="Search posts..." 
+                                       value="{{ request('search') }}"
+                                       class="w-full px-4 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500">
+                                <button type="submit" 
+                                        class="ml-2 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg transition duration-200">
+                                    Search
+                                </button>
+                            </form>
+                        </div>
 
-                    <!-- Tag Filter -->
-                    <div class="bg-white rounded-lg shadow-lg p-6">
-                        <h3 class="text-xl font-semibold text-gray-900 mb-4">Tags</h3>
-                        <ul class="flex flex-wrap gap-2">
-                            @foreach ($tags as $tag)
-                                <li>
-                                    <a href="{{ route('home', ['tag' => $tag->slug]) }}" class="bg-gray-100 text-gray-600 px-3 py-1 rounded-full hover:bg-blue-100 hover:text-blue-600 transition-colors duration-200">
-                                        {{ $tag->name }}
-                                    </a>
-                                </li>
-                            @endforeach
-                        </ul>
+                        <!-- Category Filter -->
+                        <div class="bg-white rounded-lg shadow-lg p-6 mb-8">
+                            <h3 class="text-xl font-semibold text-gray-900 mb-4">Categories</h3>
+                            <ul class="space-y-2">
+                                @foreach ($categories as $category)
+                                    <li>
+                                        <a href="{{ route('home', ['category' => $category->slug]) }}" class="text-gray-600 hover:text-blue-600 transition-colors duration-200">
+                                            {{ $category->name }}
+                                        </a>
+                                    </li>
+                                @endforeach
+                            </ul>
+                        </div>
+
+                        <!-- Tag Filter -->
+                        <div class="bg-white rounded-lg shadow-lg p-6">
+                            <h3 class="text-xl font-semibold text-gray-900 mb-4">Tags</h3>
+                            <ul class="flex flex-wrap gap-2">
+                                @foreach ($tags as $tag)
+                                    <li>
+                                        <a href="{{ route('home', ['tag' => $tag->slug]) }}" class="bg-gray-100 text-gray-600 px-3 py-1 rounded-full hover:bg-blue-100 hover:text-blue-600 transition-colors duration-200">
+                                            {{ $tag->name }}
+                                        </a>
+                                    </li>
+                                @endforeach
+                            </ul>
+                        </div>
                     </div>
                 </div>
                 
@@ -89,12 +105,10 @@
 
                         <!-- Pagination -->
                         <div class="mt-12">
-                            {{ $posts->links() }}
+                            {{ $posts->appends(request()->query())->links() }}
                         </div>
                     @endif
                 </div>
-
-
             </div>
         </div>
     </div>

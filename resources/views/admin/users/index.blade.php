@@ -16,6 +16,39 @@
                             Add User
                         </a>
                     </div>
+
+                    <!-- Role Filter Form -->
+
+
+                    <!-- Role Filter Form -->
+                    <div class="mb-6">
+                        <div class="flex items-center gap-4">
+                            <form method="GET" action="{{ route('admin.users.index') }}">
+                                <div class="flex items-center">
+                                    <label for="role" class="mr-2 text-sm font-medium text-gray-700">Filter by
+                                        Role:</label>
+                                    <div class="relative">
+                                        <select name="role" id="role" onchange="this.form.submit()"
+                                            class="appearance-none border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 py-2 pl-3 pr-8 w-48">
+                                            @foreach ($roles as $role)
+                                                <option value="{{ $role->id }}"
+                                                    {{ request('role') == $role->id ? 'selected' : '' }}>
+                                                    {{ $role->name }}
+                                                </option>
+                                            @endforeach
+                                        </select>
+                                    </div>
+                                </div>
+                            </form>
+
+                            <!-- "All Roles" Button -->
+                            <a href="{{ route('admin.users.index') }}"
+                                class="bg-gray-200 text-gray-700 px-4 py-2 rounded-md hover:bg-gray-300 transition">
+                                All Roles
+                            </a>
+                        </div>
+                    </div>
+
                     <div class="overflow-x-auto">
                         <table class="min-w-full divide-y divide-gray-200">
                             <thead class="bg-gray-50">
@@ -45,9 +78,11 @@
                                         </td>
                                         <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                                             <span
-                                                class="px-2 py-1 text-xs font-semibold rounded-md bg-blue-100 text-blue-800">{{ $user->role->name }}</span>
+                                                class="px-2 py-1 text-xs font-semibold rounded-md bg-blue-100 text-blue-800">
+                                                {{ $user->role->name }}
+                                            </span>
                                         </td>
-                                        <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm font-medium space-x-2">
                                             <a href="{{ route('admin.users.edit', $user) }}"
                                                 class="text-blue-600 hover:text-blue-900">Edit</a>
                                             <form action="{{ route('admin.users.destroy', $user) }}" method="POST"
@@ -67,6 +102,11 @@
                                 @endforelse
                             </tbody>
                         </table>
+                    </div>
+
+                    <!-- Pagination -->
+                    <div class="mt-6">
+                        {{ $users->appends(request()->query())->links() }}
                     </div>
                 </div>
             </div>
