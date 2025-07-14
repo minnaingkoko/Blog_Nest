@@ -4,27 +4,46 @@ namespace App\Http\Controllers\Public;
 
 use App\Http\Controllers\Controller;
 use App\Models\Post;
+use App\Models\Category;
+use App\Models\Tag;
 use Illuminate\Http\Request;
 
 class PostController extends Controller
 {
-    public function index()
+    // Show all posts (with optional category/tag filters)
+    public function index(Request $request)
     {
-        $posts = Post::latest()->paginate(10);
-        return view('home', [
-            'posts' => $posts,
-            'canLike' => auth()->check(),
-            'canComment' => auth()->check()
-        ]);
+        $posts = Post::query()->published();
+
+        // Filter by category
+        if ($request->has('category')) {
+            $posts->whereHas('category', function ($query) use ($request) {
+                $query->where('slug', $request->category);
+            });
+        }
+
+        // Filter by tag
+        if ($request->has('tag')) {
+            $posts->whereHas('tags', function ($query) use ($request) {
+                $query->where('slug', $request->tag);
+            });
+        }
+
+        $posts = $posts->paginate(10);
+
+        // Get all categories and tags for the filter sidebar
+        $categories = Category::all();
+        $tags = Tag::all();
+
+        return view('public.posts.index', compact('posts', 'categories', 'tags'));
     }
 
+    // Show a single post
     public function show(Post $post)
     {
-        return view('posts.show', [
-            'post' => $post,
-            'comments' => $post->comments()->with('user')->latest()->get(),
-            'canLike' => auth()->check(),
-            'canComment' => auth()->check()
-        ]);
+        $categories = Category::all();
+        $tags = Tag::all();
+
+        return view('public.posts.show', compact('post', 'categories', 'tags'));
     }
 }
