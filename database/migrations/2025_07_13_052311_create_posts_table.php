@@ -17,11 +17,9 @@ return new class extends Migration
             $table->foreignId('category_id')->constrained()->cascadeOnDelete();
             $table->string('title');
             $table->string('slug')->unique();
-            $table->text('excerpt');
             $table->longText('content');
             $table->string('featured_image')->nullable();
             $table->enum('status', ['draft', 'pending', 'published'])->default('draft');
-            $table->timestamp('published_at')->nullable();
             $table->timestamps();
             $table->softDeletes();
         });

@@ -3,23 +3,25 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Models\Post;
 use App\Models\User;
 use App\Models\Role;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
 
 class UserController extends Controller
 {
     public function index(Request $request)
     {
         $query = User::query();
-        
+
         if ($request->has('role')) {
             $query->where('role_id', $request->role);
         }
-        
+
         $users = $query->with('role')->latest()->paginate(10);
         $roles = Role::all();
-        
+
         return view('admin.users.index', compact('users', 'roles'));
     }
 
@@ -32,16 +34,34 @@ class UserController extends Controller
     public function store(Request $request)
     {
         $data = $request->validate([
-            'name' => 'required|string|max:255',
-            'email' => 'required|email|unique:users',
-            'password' => 'required|string|min:8',
-            'role_id' => 'required|exists:roles,id'
+            'title' => 'required|string|max:255',
+            'slug' => 'required|string|max:255|unique:posts',
+            'content' => 'required|string',
+            'featured_image' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
+            'status' => 'required|in:draft,published',
+            'category_id' => 'required|exists:categories,id',
+            'tags' => 'nullable|array',
+            'tags.*' => 'exists:tags,id',
         ]);
 
-        $data['password'] = bcrypt($data['password']);
-        User::create($data);
+        // Handle featured image upload
+        if ($request->hasFile('featured_image')) {
+            $data['featured_image'] = $request->file('featured_image')->store('posts', 'public');
+        }
 
-        return redirect()->route('admin.users.index')->with('success', 'User created successfully.');
+        // Assign the logged-in user
+        $data['user_id'] = auth()->id();
+
+        // Create the post
+        $post = Post::create($data);
+
+        // Sync tags
+        if ($request->has('tags')) {
+            $post->tags()->sync($request->tags);
+        }
+
+        return redirect()->route('admin.posts.index')
+            ->with('success', 'Post created successfully!');
     }
 
     public function show(User $user)
@@ -55,23 +75,36 @@ class UserController extends Controller
         return view('admin.users.edit', compact('user', 'roles'));
     }
 
-    public function update(Request $request, User $user)
+    public function update(Request $request, Post $post)
     {
         $data = $request->validate([
-            'name' => 'required|string|max:255',
-            'email' => 'required|email|unique:users,email,' . $user->id,
-            'password' => 'nullable|string|min:8',
-            'role_id' => 'required|exists:roles,id'
+            'title' => 'required|string|max:255',
+            'slug' => 'required|string|max:255|unique:posts,slug,' . $post->id,
+            'content' => 'required|string',
+            'featured_image' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
+            'status' => 'required|in:draft,published',
+            'category_id' => 'required|exists:categories,id',
+            'tags' => 'nullable|array',
+            'tags.*' => 'exists:tags,id',
         ]);
 
-        if (!empty($data['password'])) {
-            $data['password'] = bcrypt($data['password']);
-        } else {
-            unset($data['password']);
+        // Handle featured image upload
+        if ($request->hasFile('featured_image')) {
+            // Delete the old image
+            if ($post->featured_image) {
+                Storage::disk('public')->delete($post->featured_image);
+            }
+            $data['featured_image'] = $request->file('featured_image')->store('posts', 'public');
         }
 
-        $user->update($data);
-        return redirect()->route('admin.users.index')->with('success', 'User updated successfully.');
+        // Update the post
+        $post->update($data);
+
+        // Sync tags
+        $post->tags()->sync($request->tags ?? []);
+
+        return redirect()->route('admin.posts.index')
+            ->with('success', 'Post updated successfully!');
     }
 
     public function destroy(User $user)
@@ -95,7 +128,7 @@ class UserController extends Controller
         }
 
         $user->update(['role_id' => $request->role_id]);
-        
+
         return redirect()->back()
             ->with('success', "User role changed successfully to " . $user->fresh()->role->name);
     }
@@ -121,12 +154,12 @@ class UserController extends Controller
                 $users->each->delete();
                 $message = 'Selected users deleted successfully.';
                 break;
-                
+
             case 'promote':
                 $users->each->update(['role_id' => 2]);
                 $message = 'Selected users promoted to author successfully.';
                 break;
-                
+
             case 'demote':
                 $users->each->update(['role_id' => 3]);
                 $message = 'Selected users demoted to regular user successfully.';

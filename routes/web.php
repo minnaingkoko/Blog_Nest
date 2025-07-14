@@ -1,9 +1,11 @@
 <?php
 
+use App\Http\Controllers\Admin\CategoryController;
 use App\Http\Controllers\Admin\PostController as AdminPostController;
 use App\Http\Controllers\Admin\DashboardController as AdminDashboardController;
 use App\Http\Controllers\Admin\UserController as AdminUserController;
 use App\Http\Controllers\Admin\SettingsController;
+use App\Http\Controllers\Admin\TagController;
 
 use App\Http\Controllers\Author\PostController as AuthorPostController;
 use App\Http\Controllers\Author\DashboardController as AuthorDashboardController;
@@ -87,4 +89,8 @@ Route::prefix('admin')->middleware(['auth', 'verified', 'role.admin'])->group(fu
     // Admin Settings Management
     Route::get('/settings', [SettingsController::class, 'edit'])->name('admin.settings.edit');
     Route::post('/settings', [SettingsController::class, 'update'])->name('admin.settings.update');
+
+    Route::resource('/categories', CategoryController::class)->names('admin.categories');
+
+    Route::resource('/tags', TagController::class)->names('admin.tags');
 });
