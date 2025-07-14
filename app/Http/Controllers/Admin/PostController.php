@@ -19,7 +19,6 @@ class PostController extends Controller
     }
 
     // Show the form for creating a new post
-
     public function create()
     {
         $categories = Category::all();
@@ -28,17 +27,14 @@ class PostController extends Controller
     }
 
     // Store a newly created post in the database
-
     public function store(Request $request)
     {
         $data = $request->validate([
             'title' => 'required|string|max:255',
             'slug' => 'required|string|max:255|unique:posts',
-            'excerpt' => 'required|string|max:255',
             'content' => 'required|string',
             'featured_image' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
-            'status' => 'required|in:draft,pending,published',
-            'published_at' => 'nullable|date',
+            'status' => 'required|in:draft,published',
             'category_id' => 'required|exists:categories,id',
             'tags' => 'nullable|array',
             'tags.*' => 'exists:tags,id',
@@ -84,11 +80,9 @@ class PostController extends Controller
         $data = $request->validate([
             'title' => 'required|string|max:255',
             'slug' => 'required|string|max:255|unique:posts,slug,' . $post->id,
-            'excerpt' => 'required|string|max:255',
             'content' => 'required|string',
             'featured_image' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
-            'status' => 'required|in:draft,pending,published',
-            'published_at' => 'nullable|date',
+            'status' => 'required|in:draft,published',
             'category_id' => 'required|exists:categories,id',
             'tags' => 'nullable|array',
             'tags.*' => 'exists:tags,id',
@@ -116,6 +110,11 @@ class PostController extends Controller
     // Remove the specified post from the database
     public function destroy(Post $post)
     {
+        // Delete the featured image
+        if ($post->featured_image) {
+            Storage::disk('public')->delete($post->featured_image);
+        }
+
         $post->delete();
         return redirect()->route('admin.posts.index')
             ->with('success', 'Post deleted successfully!');

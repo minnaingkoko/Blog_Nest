@@ -3,11 +3,9 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
-use App\Models\Post;
 use App\Models\User;
 use App\Models\Role;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Storage;
 
 class UserController extends Controller
 {
@@ -34,34 +32,18 @@ class UserController extends Controller
     public function store(Request $request)
     {
         $data = $request->validate([
-            'title' => 'required|string|max:255',
-            'slug' => 'required|string|max:255|unique:posts',
-            'content' => 'required|string',
-            'featured_image' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
-            'status' => 'required|in:draft,published',
-            'category_id' => 'required|exists:categories,id',
-            'tags' => 'nullable|array',
-            'tags.*' => 'exists:tags,id',
+            'name' => 'required|string|max:255',
+            'email' => 'required|email|unique:users',
+            'password' => 'required|string|min:8',
+            'role_id' => 'required|exists:roles,id'
         ]);
 
-        // Handle featured image upload
-        if ($request->hasFile('featured_image')) {
-            $data['featured_image'] = $request->file('featured_image')->store('posts', 'public');
-        }
+        $data['password'] = bcrypt($data['password']);
+        $data['email_verified_at'] = now(); // Mark email as verified
 
-        // Assign the logged-in user
-        $data['user_id'] = auth()->id();
+        User::create($data);
 
-        // Create the post
-        $post = Post::create($data);
-
-        // Sync tags
-        if ($request->has('tags')) {
-            $post->tags()->sync($request->tags);
-        }
-
-        return redirect()->route('admin.posts.index')
-            ->with('success', 'Post created successfully!');
+        return redirect()->route('admin.users.index')->with('success', 'User created successfully.');
     }
 
     public function show(User $user)
@@ -75,36 +57,23 @@ class UserController extends Controller
         return view('admin.users.edit', compact('user', 'roles'));
     }
 
-    public function update(Request $request, Post $post)
+    public function update(Request $request, User $user)
     {
         $data = $request->validate([
-            'title' => 'required|string|max:255',
-            'slug' => 'required|string|max:255|unique:posts,slug,' . $post->id,
-            'content' => 'required|string',
-            'featured_image' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
-            'status' => 'required|in:draft,published',
-            'category_id' => 'required|exists:categories,id',
-            'tags' => 'nullable|array',
-            'tags.*' => 'exists:tags,id',
+            'name' => 'required|string|max:255',
+            'email' => 'required|email|unique:users,email,' . $user->id,
+            'password' => 'nullable|string|min:8',
+            'role_id' => 'required|exists:roles,id'
         ]);
 
-        // Handle featured image upload
-        if ($request->hasFile('featured_image')) {
-            // Delete the old image
-            if ($post->featured_image) {
-                Storage::disk('public')->delete($post->featured_image);
-            }
-            $data['featured_image'] = $request->file('featured_image')->store('posts', 'public');
+        if (!empty($data['password'])) {
+            $data['password'] = bcrypt($data['password']);
+        } else {
+            unset($data['password']);
         }
 
-        // Update the post
-        $post->update($data);
-
-        // Sync tags
-        $post->tags()->sync($request->tags ?? []);
-
-        return redirect()->route('admin.posts.index')
-            ->with('success', 'Post updated successfully!');
+        $user->update($data);
+        return redirect()->route('admin.users.index')->with('success', 'User updated successfully.');
     }
 
     public function destroy(User $user)

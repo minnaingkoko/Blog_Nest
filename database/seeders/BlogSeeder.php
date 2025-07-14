@@ -85,34 +85,29 @@ class BlogSeeder extends Seeder
             Tag::create($tag);
         }
 
-        // Create Posts
+        // Create Posts (removed excerpt and published_at)
         $posts = [
             [
                 'user_id' => $author->id,
                 'category_id' => Category::where('slug', 'technology')->first()->id,
                 'title' => 'Getting Started with Laravel',
                 'slug' => 'getting-started-with-laravel',
-                'excerpt' => 'Learn how to start a new Laravel project',
                 'content' => 'This is the full content of the Laravel tutorial post...',
                 'status' => 'published',
-                'published_at' => now(),
             ],
             [
                 'user_id' => $author->id,
                 'category_id' => Category::where('slug', 'technology')->first()->id,
                 'title' => 'Advanced PHP Techniques',
                 'slug' => 'advanced-php-techniques',
-                'excerpt' => 'Take your PHP skills to the next level',
                 'content' => 'This post covers advanced PHP concepts...',
                 'status' => 'published',
-                'published_at' => now(),
             ],
             [
                 'user_id' => $author->id,
                 'category_id' => Category::where('slug', 'business')->first()->id,
                 'title' => 'Startup Funding Strategies',
                 'slug' => 'startup-funding-strategies',
-                'excerpt' => 'How to fund your new business venture',
                 'content' => 'This post explores various funding options...',
                 'status' => 'draft',
             ],

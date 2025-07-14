@@ -76,21 +76,16 @@ Route::prefix('admin')->middleware(['auth', 'verified', 'role.admin'])->group(fu
     // Admin Posts Management
     Route::resource('/posts', AdminPostController::class)->names('admin.posts');
 
+    // Admin Categories Management
+    Route::resource('/categories', CategoryController::class)->names('admin.categories');
+
+    // Admin Tags Management
+    Route::resource('/tags', TagController::class)->names('admin.tags');
+
     // Admin Users Management
     Route::resource('/users', AdminUserController::class)->names('admin.users');
-
-    // Additional user routes
-    Route::post('/users/{user}/change-role', [AdminUserController::class, 'changeRole'])
-        ->name('admin.users.change-role');
-
-    Route::post('/users/bulk-action', [AdminUserController::class, 'bulkAction'])
-        ->name('admin.users.bulk-action');
 
     // Admin Settings Management
     Route::get('/settings', [SettingsController::class, 'edit'])->name('admin.settings.edit');
     Route::post('/settings', [SettingsController::class, 'update'])->name('admin.settings.update');
-
-    Route::resource('/categories', CategoryController::class)->names('admin.categories');
-
-    Route::resource('/tags', TagController::class)->names('admin.tags');
 });

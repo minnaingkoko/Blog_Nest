@@ -12,54 +12,74 @@
                     <form action="{{ route('admin.posts.store') }}" method="POST" enctype="multipart/form-data">
                         @csrf
 
+                        <!-- Title -->
                         <div class="mb-6">
                             <label class="block font-medium text-gray-700 mb-2">Title</label>
-                            <input type="text" name="title" class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:border-blue-500" required>
+                            <input type="text" name="title"
+                                class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:border-blue-500"
+                                required>
                         </div>
 
+                        <!-- Slug -->
                         <div class="mb-6">
                             <label class="block font-medium text-gray-700 mb-2">Slug</label>
-                            <input type="text" name="slug" class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:border-blue-500" required>
+                            <input type="text" name="slug"
+                                class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:border-blue-500"
+                                required>
                         </div>
 
+                        <!-- Content -->
                         <div class="mb-6">
                             <label class="block font-medium text-gray-700 mb-2">Content</label>
-                            <textarea name="content" rows="8" class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:border-blue-500" required></textarea>
+                            <textarea name="content" rows="8"
+                                class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:border-blue-500" required></textarea>
                         </div>
 
+                        <!-- Featured Image -->
                         <div class="mb-6">
                             <label class="block font-medium text-gray-700 mb-2">Featured Image</label>
-                            <input type="file" name="featured_image" class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:border-blue-500">
+                            <input type="file" name="featured_image"
+                                class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:border-blue-500">
                         </div>
 
+                        <!-- Status -->
                         <div class="mb-6">
                             <label class="block font-medium text-gray-700 mb-2">Status</label>
-                            <select name="status" class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:border-blue-500" required>
+                            <select name="status"
+                                class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:border-blue-500"
+                                required>
                                 <option value="draft">Draft</option>
                                 <option value="published">Published</option>
                             </select>
                         </div>
 
+                        <!-- Category -->
                         <div class="mb-6">
                             <label class="block font-medium text-gray-700 mb-2">Category</label>
-                            <select name="category_id" class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:border-blue-500" required>
-                                @foreach($categories as $category)
+                            <select name="category_id"
+                                class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:border-blue-500"
+                                required>
+                                @foreach ($categories as $category)
                                     <option value="{{ $category->id }}">{{ $category->name }}</option>
                                 @endforeach
                             </select>
                         </div>
 
+                        <!-- Tags -->
                         <div class="mb-6">
                             <label class="block font-medium text-gray-700 mb-2">Tags</label>
-                            <select name="tags[]" class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:border-blue-500" multiple>
-                                @foreach($tags as $tag)
+                            <select name="tags[]"
+                                class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:border-blue-500"
+                                multiple>
+                                @foreach ($tags as $tag)
                                     <option value="{{ $tag->id }}">{{ $tag->name }}</option>
                                 @endforeach
                             </select>
                         </div>
 
                         <div class="flex justify-end">
-                            <button type="submit" class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 transition">
+                            <button type="submit"
+                                class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 transition">
                                 Create Post
                             </button>
                         </div>
