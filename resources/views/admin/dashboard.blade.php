@@ -61,35 +61,10 @@
             <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg mb-8">
                 <div class="p-6 text-gray-900">
                     <div class="flex justify-between items-center mb-6">
-                        <h3 class="text-lg font-semibold">Quick Actions</h3>
+                        <h3 class="text-lg font-semibold">Manage Content</h3>
                     </div>
-                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-                        <a href="{{ route('admin.users.create') }}" class="block p-4 border border-gray-200 rounded-lg hover:bg-gray-50 transition">
-                            <div class="flex items-center">
-                                <div class="p-3 rounded-full bg-blue-100 text-blue-600 mr-4">
-                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
-                                    </svg>
-                                </div>
-                                <div>
-                                    <h4 class="text-md font-semibold">Create New User</h4>
-                                    <p class="text-sm text-gray-600">Add a new user to the system</p>
-                                </div>
-                            </div>
-                        </a>
-                        <a href="{{ route('admin.posts.create') }}" class="block p-4 border border-gray-200 rounded-lg hover:bg-gray-50 transition">
-                            <div class="flex items-center">
-                                <div class="p-3 rounded-full bg-green-100 text-green-600 mr-4">
-                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
-                                    </svg>
-                                </div>
-                                <div>
-                                    <h4 class="text-md font-semibold">Create New Post</h4>
-                                    <p class="text-sm text-gray-600">Add a new blog post</p>
-                                </div>
-                            </div>
-                        </a>
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                        <!-- Manage Users Card -->
                         <a href="{{ route('admin.users.index') }}" class="block p-4 border border-gray-200 rounded-lg hover:bg-gray-50 transition">
                             <div class="flex items-center">
                                 <div class="p-3 rounded-full bg-purple-100 text-purple-600 mr-4">
@@ -100,6 +75,36 @@
                                 <div>
                                     <h4 class="text-md font-semibold">Manage Users</h4>
                                     <p class="text-sm text-gray-600">View and manage all users</p>
+                                </div>
+                            </div>
+                        </a>
+
+                        <!-- Manage Posts Card -->
+                        <a href="{{ route('admin.posts.index') }}" class="block p-4 border border-gray-200 rounded-lg hover:bg-gray-50 transition">
+                            <div class="flex items-center">
+                                <div class="p-3 rounded-full bg-blue-100 text-blue-600 mr-4">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
+                                    </svg>
+                                </div>
+                                <div>
+                                    <h4 class="text-md font-semibold">Manage Posts</h4>
+                                    <p class="text-sm text-gray-600">View and manage all posts</p>
+                                </div>
+                            </div>
+                        </a>
+
+                        <!-- General Settings Card -->
+                        <a href="{{ route('admin.settings.edit') }}" class="block p-4 border border-gray-200 rounded-lg hover:bg-gray-50 transition">
+                            <div class="flex items-center">
+                                <div class="p-3 rounded-full bg-green-100 text-green-600 mr-4">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z" />
+                                    </svg>
+                                </div>
+                                <div>
+                                    <h4 class="text-md font-semibold">General Settings</h4>
+                                    <p class="text-sm text-gray-600">Configure site settings</p>
                                 </div>
                             </div>
                         </a>

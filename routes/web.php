@@ -3,13 +3,18 @@
 use App\Http\Controllers\Admin\PostController as AdminPostController;
 use App\Http\Controllers\Admin\DashboardController as AdminDashboardController;
 use App\Http\Controllers\Admin\UserController as AdminUserController;
+use App\Http\Controllers\Admin\SettingsController;
+
 use App\Http\Controllers\Author\PostController as AuthorPostController;
+use App\Http\Controllers\Author\DashboardController as AuthorDashboardController;
 
 use App\Http\Controllers\Public\PostController as PublicPostController;
+
 use App\Http\Controllers\User\CommentController;
 use App\Http\Controllers\User\LikeController;
-use App\Http\Controllers\DashboardController;
+
 use App\Http\Controllers\ProfileController;
+
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -34,9 +39,6 @@ require __DIR__ . '/auth.php';
 |--------------------------------------------------------------------------
 */
 Route::middleware(['auth', 'verified'])->group(function () {
-    // Dashboard
-    Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
-
     // Profile
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
@@ -53,8 +55,11 @@ Route::middleware(['auth', 'verified'])->group(function () {
 |--------------------------------------------------------------------------
 */
 Route::prefix('author')->middleware(['auth', 'verified', 'role.author'])->group(function () {
-    Route::resource('posts', AuthorPostController::class)->except(['show'])->names('author.posts');
-    // Add more author-specific routes here
+    // Author Dashboard
+    Route::get('/dashboard', [AuthorDashboardController::class, 'index'])->name('author.dashboard');
+
+    // Author Posts Management
+    Route::resource('/posts', AuthorPostController::class)->names('author.posts');
 });
 
 /*
@@ -78,4 +83,8 @@ Route::prefix('admin')->middleware(['auth', 'verified', 'role.admin'])->group(fu
 
     Route::post('/users/bulk-action', [AdminUserController::class, 'bulkAction'])
         ->name('admin.users.bulk-action');
+
+    // Admin Settings Management
+    Route::get('/settings', [SettingsController::class, 'edit'])->name('admin.settings.edit');
+    Route::post('/settings', [SettingsController::class, 'update'])->name('admin.settings.update');
 });

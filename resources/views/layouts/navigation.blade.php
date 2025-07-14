@@ -18,34 +18,26 @@
                     </x-nav-link>
 
                     @auth
-                        <!-- Dashboard Link (for all authenticated users) -->
-                        <x-nav-link :href="route('admin.dashboard')" :active="request()->routeIs('dashboard')">
-                            {{ __('Dashboard') }}
-                        </x-nav-link>
-
                         <!-- Admin Links -->
                         @if (auth()->user()->isAdmin())
-                            <x-nav-link :href="route('admin.posts.index')" :active="request()->routeIs('admin.posts.*')">
-                                {{ __('Manage Posts') }}
-                            </x-nav-link>
-                            <x-nav-link :href="route('admin.users.index')" :active="request()->routeIs('admin.users.*')">
-                                {{ __('Manage Users') }}
+                            <x-nav-link :href="route('admin.dashboard')" :active="request()->routeIs('admin.dashboard')">
+                                {{ __('Dashboard') }}
                             </x-nav-link>
                         @endif
 
                         <!-- Author Links -->
                         @if (auth()->user()->isAuthor())
-                            <x-nav-link :href="route('author.posts.index')" :active="request()->routeIs('author.posts.*')">
-                                {{ __('Author Panel') }}
+                            <x-nav-link :href="route('author.dashboard')" :active="request()->routeIs('author.dashboard')">
+                                {{ __('Dashboard') }}
                             </x-nav-link>
                         @endif
 
                         <!-- User Links -->
-                        @if (auth()->user()->isUser())
+                        {{-- @if (auth()->user()->isUser())
                             <x-nav-link :href="route('user.profile')" :active="request()->routeIs('user.profile')">
                                 {{ __('My Profile') }}
                             </x-nav-link>
-                        @endif
+                        @endif --}}
                     @endauth
                 </div>
             </div>
