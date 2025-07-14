@@ -7,6 +7,7 @@ use App\Http\Controllers\Admin\UserController as AdminUserController;
 use App\Http\Controllers\Admin\SettingsController;
 use App\Http\Controllers\Admin\TagController;
 
+use App\Http\Controllers\Author\AuthorCommentController;
 use App\Http\Controllers\Author\PostController as AuthorPostController;
 use App\Http\Controllers\Author\DashboardController as AuthorDashboardController;
 
@@ -62,6 +63,17 @@ Route::prefix('author')->middleware(['auth', 'verified', 'role.author'])->group(
 
     // Author Posts Management
     Route::resource('/posts', AuthorPostController::class)->names('author.posts');
+
+    // Comments routes
+    Route::get('/comments', [AuthorCommentController::class, 'index'])->name('author.comments.index');
+    Route::get('/comments/{comment}/edit', [AuthorCommentController::class, 'edit'])->name('author.comments.edit');
+    Route::patch('/comments/{comment}/update', [AuthorCommentController::class, 'update'])->name('author.comments.update');
+    Route::patch('/comments/{comment}/approve', [AuthorCommentController::class, 'approve'])->name('author.comments.approve');
+    Route::delete('/comments/{comment}', [AuthorCommentController::class, 'destroy'])->name('author.comments.destroy');
+    
+    // Delete All Spam (MUST be inside the author group!)
+    Route::post('/comments/delete-all-spam', [AuthorCommentController::class, 'deleteAllSpam'])
+        ->name('author.comments.deleteAllSpam');
 });
 
 /*

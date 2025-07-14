@@ -118,22 +118,30 @@ class BlogSeeder extends Seeder
         $comments = [];
         foreach (Post::all() as $post) {
             for ($i = 1; $i <= 3; $i++) {
+                $content = $this->generateCommentContent($i, $post->id);
+                $isSpam = $this->isCommentSpam($content); // Check if the comment is spam
+
                 $comment = [
                     'user_id' => User::inRandomOrder()->first()->id,
                     'post_id' => $post->id,
-                    'content' => 'This is a sample comment ' . $i . ' on post ' . $post->id . '.',
-                    'is_approved' => rand(0, 1),
+                    'content' => $content,
+                    'is_approved' => !$isSpam, // Auto-approve if not spam
+                    'is_spam' => $isSpam, // Mark as spam if content is spammy
                 ];
                 $comments[] = $comment;
 
                 // Add nested replies to this comment
                 if ($i === 1) {
+                    $replyContent = $this->generateCommentContent($i, $post->id, true);
+                    $isReplySpam = $this->isCommentSpam($replyContent); // Check if the reply is spam
+
                     $reply = [
                         'user_id' => User::inRandomOrder()->first()->id,
                         'post_id' => $post->id,
                         'parent_id' => count($comments), // Reply to the parent comment
-                        'content' => 'This is a reply to comment ' . $i . ' on post ' . $post->id . '.',
-                        'is_approved' => rand(0, 1),
+                        'content' => $replyContent,
+                        'is_approved' => !$isReplySpam, // Auto-approve if not spam
+                        'is_spam' => $isReplySpam, // Mark as spam if content is spammy
                     ];
                     $comments[] = $reply;
                 }
@@ -165,5 +173,49 @@ class BlogSeeder extends Seeder
                 'facebook' => 'https://facebook.com/yourblog'
             ]
         ]);
+    }
+
+    /**
+     * Generate comment content.
+     */
+    protected function generateCommentContent($commentIndex, $postId, $isReply = false): string
+    {
+        $template = $isReply
+            ? 'This is a reply to comment ' . $commentIndex . ' on post ' . $postId . '.'
+            : 'This is a sample comment ' . $commentIndex . ' on post ' . $postId . '.';
+
+        // Randomly add spammy content
+        if (rand(1, 10) <= 3) { // 30% chance of spam
+            $spamWords = ['BUY NOW', 'DISCOUNT CODE', 'FREE GIFT', '$$$', '!!!', 'CLICK HERE'];
+            $template .= ' ' . $spamWords[array_rand($spamWords)];
+        }
+
+        return $template;
+    }
+
+    /**
+     * Check if a comment is spam.
+     */
+    protected function isCommentSpam($content): bool
+    {
+        // Rule 1: Contains spammy keywords
+        $spamKeywords = ['BUY NOW', 'DISCOUNT CODE', 'FREE GIFT', '$$$', '!!!', 'CLICK HERE'];
+        foreach ($spamKeywords as $keyword) {
+            if (strpos($content, $keyword) !== false) {
+                return true;
+            }
+        }
+
+        // Rule 2: Too many ALL-CAPS words
+        if (preg_match_all('/\b[A-Z]{3,}\b/', $content) > 2) {
+            return true;
+        }
+
+        // Rule 3: Excessive special characters
+        if (substr_count($content, '!') > 3 || substr_count($content, '$') > 2) {
+            return true;
+        }
+
+        return false; // Not spam
     }
 }

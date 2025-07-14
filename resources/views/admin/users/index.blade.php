@@ -41,12 +41,6 @@
                                     </div>
                                 </div>
                             </form>
-
-                            <!-- "All Roles" Button -->
-                            <a href="{{ route('admin.users.index') }}"
-                                class="bg-gray-200 text-gray-700 px-4 py-2 rounded-md hover:bg-gray-300 transition">
-                                All Roles
-                            </a>
                         </div>
                     </div>
 
