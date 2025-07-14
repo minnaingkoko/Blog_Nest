@@ -9,6 +9,7 @@
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
             <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
                 <div class="p-6 bg-white border-b border-gray-200">
+                    <!-- Header and Add Post Button -->
                     <div class="flex justify-between items-center mb-6">
                         <h3 class="text-lg font-semibold">All Posts</h3>
                         <a href="{{ route('admin.posts.create') }}" class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 transition">
@@ -16,12 +17,29 @@
                         </a>
                     </div>
 
+                    <!-- Success Message -->
                     @if (session('success'))
                         <div class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded mb-6">
                             {{ session('success') }}
                         </div>
                     @endif
 
+                    <!-- Status Filter -->
+                    <form method="GET" action="{{ route('admin.posts.index') }}" class="mb-6">
+                        <div class="flex items-center gap-4">
+                            <label for="status" class="text-sm font-medium text-gray-700">Filter by Status:</label>
+                            <div class="relative">
+                                <select name="status" id="status" onchange="this.form.submit()" class="block appearance-none w-full bg-white border border-gray-300 text-gray-700 py-2 px-4 pr-8 rounded leading-tight focus:outline-none focus:border-blue-500">
+                                    <option value="">All</option>
+                                    <option value="published" {{ request('status') === 'published' ? 'selected' : '' }}>Published</option>
+                                    <option value="pending" {{ request('status') === 'pending' ? 'selected' : '' }}>Pending</option>
+                                    <option value="draft" {{ request('status') === 'draft' ? 'selected' : '' }}>Draft</option>
+                                </select>
+                            </div>
+                        </div>
+                    </form>
+
+                    <!-- Posts Table -->
                     <div class="overflow-x-auto">
                         <table class="min-w-full bg-white">
                             <thead>
@@ -65,8 +83,9 @@
                         </table>
                     </div>
 
+                    <!-- Pagination -->
                     <div class="mt-4">
-                        {{ $posts->links() }}
+                        {{ $posts->appends(request()->query())->links() }}
                     </div>
                 </div>
             </div>

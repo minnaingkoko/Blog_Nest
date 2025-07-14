@@ -12,9 +12,15 @@ use Illuminate\Support\Facades\Storage;
 class PostController extends Controller
 {
     // Display a listing of the posts
-    public function index()
+    public function index(Request $request)
     {
-        $posts = Post::with(['user', 'category', 'tags'])->latest()->paginate(10);
+        $posts = Post::with('user')
+            ->when($request->status, function ($query, $status) {
+                return $query->where('status', $status);
+            })
+            ->latest()
+            ->paginate(10);
+
         return view('admin.posts.index', compact('posts'));
     }
 

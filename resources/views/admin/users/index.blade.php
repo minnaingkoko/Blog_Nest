@@ -30,9 +30,10 @@
                                     <div class="relative">
                                         <select name="role" id="role" onchange="this.form.submit()"
                                             class="appearance-none border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 py-2 pl-3 pr-8 w-48">
+                                            <option value="">All Roles</option>
                                             @foreach ($roles as $role)
-                                                <option value="{{ $role->id }}"
-                                                    {{ request('role') == $role->id ? 'selected' : '' }}>
+                                                <option value="{{ $role->name }}"
+                                                    {{ request('role') == $role->name ? 'selected' : '' }}>
                                                     {{ $role->name }}
                                                 </option>
                                             @endforeach

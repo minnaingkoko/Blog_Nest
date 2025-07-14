@@ -11,13 +11,15 @@ class UserController extends Controller
 {
     public function index(Request $request)
     {
-        $query = User::query();
+        $query = User::query()->with('role');
 
-        if ($request->has('role')) {
-            $query->where('role_id', $request->role);
+        if ($request->filled('role')) { // Check if 'role' is not empty
+            $query->whereHas('role', function ($q) use ($request) {
+                $q->where('name', $request->role);
+            });
         }
 
-        $users = $query->with('role')->latest()->paginate(10);
+        $users = $query->latest()->paginate(10);
         $roles = Role::all();
 
         return view('admin.users.index', compact('users', 'roles'));
