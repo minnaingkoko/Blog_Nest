@@ -31,8 +31,28 @@ class PostController extends Controller
 
     public function store(StorePostRequest $request)
     {
-        $post = Post::create($request->validated());
-        return redirect()->route('author.posts.index')->with('success', 'Post created successfully.');
+        // Validate and get the request data
+        $data = $request->validated();
+
+        // Set the user ID to the authenticated user
+        $data['user_id'] = auth()->id();
+
+        // Handle file upload for featured image
+        if ($request->hasFile('featured_image')) {
+            $data['featured_image'] = $request->file('featured_image')->store('posts', 'public');
+        }
+
+        // Create the post
+        $post = Post::create($data);
+
+        // Sync tags if provided
+        if ($request->has('tags')) {
+            $post->tags()->sync($request->tags);
+        }
+
+        // Redirect to the author posts index with success message
+        return redirect()->route('author.posts.index')
+            ->with('success', 'Post created successfully!');
     }
 
     public function edit(Post $post)

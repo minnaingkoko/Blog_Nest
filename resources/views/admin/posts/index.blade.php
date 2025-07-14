@@ -28,6 +28,7 @@
                                 <tr>
                                     <th class="px-6 py-3 border-b-2 border-gray-300 text-left text-sm leading-4 font-semibold">Title</th>
                                     <th class="px-6 py-3 border-b-2 border-gray-300 text-left text-sm leading-4 font-semibold">Author</th>
+                                    <th class="px-6 py-3 border-b-2 border-gray-300 text-left text-sm leading-4 font-semibold">Status</th>
                                     <th class="px-6 py-3 border-b-2 border-gray-300 text-left text-sm leading-4 font-semibold">Actions</th>
                                 </tr>
                             </thead>
@@ -37,7 +38,21 @@
                                         <td class="px-6 py-4 border-b border-gray-300">{{ $post->title }}</td>
                                         <td class="px-6 py-4 border-b border-gray-300">{{ $post->user->name }}</td>
                                         <td class="px-6 py-4 border-b border-gray-300">
+                                            <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full 
+                                                {{ $post->status === 'published' ? 'bg-green-100 text-green-800' : 
+                                                   ($post->status === 'pending' ? 'bg-yellow-100 text-yellow-800' : 'bg-gray-100 text-gray-800') }}">
+                                                {{ ucfirst($post->status) }}
+                                            </span>
+                                        </td>
+                                        <td class="px-6 py-4 border-b border-gray-300">
                                             <a href="{{ route('admin.posts.edit', $post) }}" class="text-blue-600 hover:text-blue-800 mr-2">Edit</a>
+                                            @if($post->status === 'pending')
+                                                <form action="{{ route('admin.posts.approve', $post) }}" method="POST" class="inline">
+                                                    @csrf
+                                                    @method('PATCH')
+                                                    <button type="submit" class="text-green-600 hover:text-green-800 mr-2">Approve</button>
+                                                </form>
+                                            @endif
                                             <form action="{{ route('admin.posts.destroy', $post) }}" method="POST" class="inline" onsubmit="return confirm('Are you sure you want to delete this post?')">
                                                 @csrf
                                                 @method('DELETE')

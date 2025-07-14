@@ -119,4 +119,13 @@ class PostController extends Controller
         return redirect()->route('admin.posts.index')
             ->with('success', 'Post deleted successfully!');
     }
+
+    public function approve(Post $post)
+    {
+        // Update the post status to 'published'
+        $post->update(['status' => 'published']);
+
+        return redirect()->route('admin.posts.index')
+            ->with('success', 'Post approved successfully!');
+    }
 }

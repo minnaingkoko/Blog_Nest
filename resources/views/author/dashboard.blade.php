@@ -14,21 +14,6 @@
                         <h3 class="text-lg font-semibold">Quick Actions</h3>
                     </div>
                     <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-                        <!-- Create New Post -->
-                        <a href="{{ route('author.posts.create') }}" class="block p-4 border border-gray-200 rounded-lg hover:bg-gray-50 transition">
-                            <div class="flex items-center">
-                                <div class="p-3 rounded-full bg-blue-100 text-blue-600 mr-4">
-                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
-                                    </svg>
-                                </div>
-                                <div>
-                                    <h4 class="text-md font-semibold">Create New Post</h4>
-                                    <p class="text-sm text-gray-600">Start a new blog post</p>
-                                </div>
-                            </div>
-                        </a>
-
                         <!-- View All Posts -->
                         <a href="{{ route('author.posts.index') }}" class="block p-4 border border-gray-200 rounded-lg hover:bg-gray-50 transition">
                             <div class="flex items-center">
@@ -40,21 +25,6 @@
                                 <div>
                                     <h4 class="text-md font-semibold">Manage Posts</h4>
                                     <p class="text-sm text-gray-600">View all your posts</p>
-                                </div>
-                            </div>
-                        </a>
-
-                        <!-- View Drafts -->
-                        <a href="{{ route('author.posts.index', ['status' => 'draft']) }}" class="block p-4 border border-gray-200 rounded-lg hover:bg-gray-50 transition">
-                            <div class="flex items-center">
-                                <div class="p-3 rounded-full bg-gray-100 text-gray-600 mr-4">
-                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
-                                    </svg>
-                                </div>
-                                <div>
-                                    <h4 class="text-md font-semibold">View Drafts</h4>
-                                    <p class="text-sm text-gray-600">Manage your draft posts</p>
                                 </div>
                             </div>
                         </a>

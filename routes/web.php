@@ -76,6 +76,8 @@ Route::prefix('admin')->middleware(['auth', 'verified', 'role.admin'])->group(fu
     // Admin Posts Management
     Route::resource('/posts', AdminPostController::class)->names('admin.posts');
 
+    Route::patch('/posts/{post}/approve', [AdminPostController::class, 'approve'])->name('admin.posts.approve');
+
     // Admin Categories Management
     Route::resource('/categories', CategoryController::class)->names('admin.categories');
 

@@ -31,13 +31,6 @@
                                 {{ __('Dashboard') }}
                             </x-nav-link>
                         @endif
-
-                        <!-- User Links -->
-                        {{-- @if (auth()->user()->isUser())
-                            <x-nav-link :href="route('user.profile')" :active="request()->routeIs('user.profile')">
-                                {{ __('My Profile') }}
-                            </x-nav-link>
-                        @endif --}}
                     @endauth
                 </div>
             </div>

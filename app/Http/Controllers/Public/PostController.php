@@ -41,9 +41,12 @@ class PostController extends Controller
     // Show a single post
     public function show(Post $post)
     {
-        $categories = Category::all();
-        $tags = Tag::all();
+        // Fetch the post with its relationships
+        $post->load('user', 'tags', 'comments.user');
 
-        return view('public.posts.show', compact('post', 'categories', 'tags'));
+        // Check if the authenticated user can comment
+        $canComment = auth()->check(); // Only logged-in users can comment
+
+        return view('public.posts.show', compact('post', 'canComment'));
     }
 }
