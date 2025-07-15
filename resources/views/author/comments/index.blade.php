@@ -14,8 +14,7 @@
                     <label for="filter" class="mr-2">Filter by Status:</label>
                     <select name="filter" onchange="this.form.submit()" class="border rounded p-2">
                         <option value="">All</option>
-                        <option value="approved" {{ request('filter') === 'approved' ? 'selected' : '' }}>Approved
-                        </option>
+                        <option value="approved" {{ request('filter') === 'approved' ? 'selected' : '' }}>Approved</option>
                         <option value="spam" {{ request('filter') === 'spam' ? 'selected' : '' }}>Spam</option>
                     </select>
                 </form>
@@ -27,7 +26,6 @@
                     <button type="submit" class="bg-red-600 text-white px-4 py-2 rounded">Delete All Spam</button>
                 </form>
             </div>
-
 
             <!-- Comments Table -->
             <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
@@ -42,18 +40,18 @@
                         <table class="min-w-full bg-white">
                             <thead>
                                 <tr>
-                                    <th
-                                        class="px-6 py-3 border-b-2 border-gray-300 text-left text-sm leading-4 font-semibold">
-                                        Post</th>
-                                    <th
-                                        class="px-6 py-3 border-b-2 border-gray-300 text-left text-sm leading-4 font-semibold">
-                                        Comment</th>
-                                    <th
-                                        class="px-6 py-3 border-b-2 border-gray-300 text-left text-sm leading-4 font-semibold">
-                                        Status</th>
-                                    <th
-                                        class="px-6 py-3 border-b-2 border-gray-300 text-left text-sm leading-4 font-semibold">
-                                        Actions</th>
+                                    <th class="px-6 py-3 border-b-2 border-gray-300 text-left text-sm leading-4 font-semibold">
+                                        Post
+                                    </th>
+                                    <th class="px-6 py-3 border-b-2 border-gray-300 text-left text-sm leading-4 font-semibold">
+                                        Commented By
+                                    </th>
+                                    <th class="px-6 py-3 border-b-2 border-gray-300 text-left text-sm leading-4 font-semibold">
+                                        Status
+                                    </th>
+                                    <th class="px-6 py-3 border-b-2 border-gray-300 text-left text-sm leading-4 font-semibold">
+                                        Actions
+                                    </th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -65,7 +63,9 @@
                                                 {{ Str::limit($comment->post->title, 50) }}
                                             </a>
                                         </td>
-                                        <td class="px-6 py-4 border-b border-gray-300">{{ $comment->content }}</td>
+                                        <td class="px-6 py-4 border-b border-gray-300">
+                                            {{ $comment->user->name }}
+                                        </td>
                                         <td class="px-6 py-4 border-b border-gray-300">
                                             <span
                                                 class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full {{ $comment->is_spam ? 'bg-red-100 text-red-800' : 'bg-green-100 text-green-800' }}">
@@ -99,7 +99,7 @@
                                     </tr>
                                 @empty
                                     <tr>
-                                        <td colspan="4" class="px-6 py-4 text-center text-gray-500">No comments
+                                        <td colspan="5" class="px-6 py-4 text-center text-gray-500">No comments
                                             found.</td>
                                     </tr>
                                 @endforelse

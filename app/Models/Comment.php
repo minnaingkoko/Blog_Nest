@@ -55,15 +55,32 @@ class Comment extends Model
         return false; // Not spam
     }
 
-    // Relationship to Post
+    /**
+     * Relationship to Post.
+     */
     public function post()
     {
         return $this->belongsTo(Post::class);
     }
 
-    // Relationship to User
+    /**
+     * Relationship to User.
+     */
     public function user()
     {
         return $this->belongsTo(User::class);
+    }
+
+    public function likes()
+    {
+        return $this->morphMany(Like::class, 'likeable');
+    }
+
+    /**
+     * Relationship to Replies (nested comments).
+     */
+    public function replies()
+    {
+        return $this->hasMany(Comment::class, 'parent_id')->where('is_approved', true)->where('is_spam', false);
     }
 }

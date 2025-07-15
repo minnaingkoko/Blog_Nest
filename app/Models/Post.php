@@ -12,8 +12,13 @@ class Post extends Model
 
     // Fillable fields
     protected $fillable = [
-        'user_id', 'category_id', 'title', 'slug', 
-        'content', 'featured_image', 'status',
+        'user_id',
+        'category_id',
+        'title',
+        'slug',
+        'content',
+        'featured_image',
+        'status',
     ];
 
     // Casts
@@ -47,10 +52,9 @@ class Post extends Model
         return $this->hasMany(Comment::class)->whereNull('parent_id');
     }
 
-    // A post can have many likes
     public function likes()
     {
-        return $this->hasMany(Like::class);
+        return $this->morphMany(Like::class, 'likeable');
     }
 
     // Scopes

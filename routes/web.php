@@ -49,7 +49,10 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
     // Post Interactions
     Route::post('/posts/{post}/comment', [CommentController::class, 'store'])->name('comments.store');
-    Route::post('/posts/{post}/like', [LikeController::class, 'store'])->name('likes.store');
+    Route::post('/comments/{comment}/toggle-replies', [CommentController::class, 'toggleReplies'])->name('comments.toggleReplies');
+
+    // Like Post or Comment
+    Route::post('/like', [LikeController::class, 'toggleLike'])->name('like.toggle');
 });
 
 /*
@@ -69,9 +72,10 @@ Route::prefix('author')->middleware(['auth', 'verified', 'role.author'])->group(
     Route::get('/comments/{comment}/edit', [AuthorCommentController::class, 'edit'])->name('author.comments.edit');
     Route::patch('/comments/{comment}/update', [AuthorCommentController::class, 'update'])->name('author.comments.update');
     Route::patch('/comments/{comment}/approve', [AuthorCommentController::class, 'approve'])->name('author.comments.approve');
+    Route::post('/comments/{comment}/mark-spam', [AuthorCommentController::class, 'markAsSpam'])->name('author.comments.markSpam');
     Route::delete('/comments/{comment}', [AuthorCommentController::class, 'destroy'])->name('author.comments.destroy');
-    
-    // Delete All Spam (MUST be inside the author group!)
+
+    // Delete All Spam
     Route::post('/comments/delete-all-spam', [AuthorCommentController::class, 'deleteAllSpam'])
         ->name('author.comments.deleteAllSpam');
 });

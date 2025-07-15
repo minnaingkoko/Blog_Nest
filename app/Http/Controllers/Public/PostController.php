@@ -47,15 +47,42 @@ class PostController extends Controller
         return view('public.posts.index', compact('posts', 'categories', 'tags'));
     }
 
-    // Show a single post
+    // Show a single post with approved comments and nested replies
     public function show(Post $post)
     {
-        // Fetch the post with its relationships
-        $post->load('user', 'tags', 'comments.user');
+        // Eager load relationships with optimized queries
+        $post->load([
+            'user',
+            'tags',
+            'comments' => function ($query) {
+                $query->where('is_approved', true)
+                    ->where('is_spam', false)
+                    ->whereNull('parent_id') // Only top-level comments
+                    ->with([
+                        'user',
+                        'replies' => function ($query) {
+                            $query->where('is_approved', true)
+                                ->where('is_spam', false)
+                                ->with('user');
+                        }
+                    ]);
+            }
+        ]);
+
+        // Count approved comments (excluding spam and replies)
+        $commentCount = $post->comments()
+            ->where('is_approved', true)
+            ->where('is_spam', false)
+            ->whereNull('parent_id')
+            ->count();
 
         // Check if the authenticated user can comment
-        $canComment = auth()->check(); // Only logged-in users can comment
+        $canComment = auth()->check();
 
-        return view('public.posts.show', compact('post', 'canComment'));
+        return view('public.posts.show', [
+            'post' => $post,
+            'canComment' => $canComment,
+            'commentCount' => $commentCount
+        ]);
     }
 }
