@@ -7,12 +7,19 @@ use App\Models\Post;
 use App\Models\Category;
 use App\Models\Tag;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Cache;
 
 class PostController extends Controller
 {
     // Show all posts (with optional category/tag filters)
     public function index(Request $request)
     {
+        // Validate filter parameters
+        $request->validate([
+            'category' => 'nullable|exists:categories,slug',
+            'tag' => 'nullable|exists:tags,slug',
+        ]);
+
         $posts = Post::query()->published();
 
         // Search functionality
@@ -38,26 +45,49 @@ class PostController extends Controller
             });
         }
 
+        // Sorting options
+        if ($request->has('sort')) {
+            switch ($request->sort) {
+                case 'newest':
+                    $posts->orderBy('created_at', 'desc');
+                    break;
+                case 'oldest':
+                    $posts->orderBy('created_at', 'asc');
+                    break;
+                case 'most_commented':
+                    $posts->withCount('comments')->orderBy('comments_count', 'desc');
+                    break;
+            }
+        }
+
         $posts = $posts->paginate(10);
 
-        // Get all categories and tags for the filter sidebar
-        $categories = Category::all();
-        $tags = Tag::all();
+        // Cache categories and tags for the filter sidebar
+        $categories = Cache::remember('public.categories', 3600, function () {
+            return Category::all();
+        });
+        $tags = Cache::remember('public.tags', 3600, function () {
+            return Tag::all();
+        });
 
         return view('public.posts.index', compact('posts', 'categories', 'tags'));
     }
 
-    // Show a single post with approved comments and nested replies
+    // Show a single post
     public function show(Post $post)
     {
+        // Ensure the post is published
+        $post = Post::published()->findOrFail($post->id);
+
         // Eager load relationships with optimized queries
         $post->load([
             'user',
             'tags',
+            'category', // Added for SEO and display purposes
             'comments' => function ($query) {
                 $query->where('is_approved', true)
                     ->where('is_spam', false)
-                    ->whereNull('parent_id') // Only top-level comments
+                    ->whereNull('parent_id')
                     ->with([
                         'user',
                         'replies' => function ($query) {
@@ -69,7 +99,7 @@ class PostController extends Controller
             }
         ]);
 
-        // Count approved comments (excluding spam and replies)
+        // Count approved comments
         $commentCount = $post->comments()
             ->where('is_approved', true)
             ->where('is_spam', false)

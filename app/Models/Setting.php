@@ -6,25 +6,24 @@ use Illuminate\Database\Eloquent\Model;
 
 class Setting extends Model
 {
+    /**
+     * The attributes that are mass assignable.
+     *
+     * @var array<string>
+     */
     protected $fillable = [
         'site_name',
         'logo_path',
-        'owner_email',
+        'favicon_path',
         'color_theme',
-        'social_links'
+        'contact_email',
+        'contact_phone',
+        'contact_address',
+        'google_map_embed',
+        'about_us_content',
+        'about_us_image',
+        'contact_us_content',
+        'contact_us_image',
+        'footer_content',
     ];
-
-    protected $casts = [
-        'social_links' => 'array'
-    ];
-
-    // Singleton pattern to always get the first record
-    public static function getSettings()
-    {
-        return self::firstOrCreate([], [
-            'site_name' => config('app.name'),
-            'owner_email' => config('mail.from.address'),
-            'color_theme' => 'light'
-        ]);
-    }
 }
